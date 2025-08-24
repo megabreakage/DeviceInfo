@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Device Info Demo</title>
+</head>
+
+<body>
+    <h1>Device Info Collection</h1>
+    <p id="status">Collecting info...</p>
+
+    <script>
+        // Object to hold client info
+        let deviceData = {
+            battery: null,
+            charging: null,
+            mouseActivity: false
+        };
+
+        // --- Battery Info ---
+        if (navigator.getBattery) {
+            navigator.getBattery().then(battery => {
+                deviceData.battery = Math.round(battery.level * 100);
+                deviceData.charging = battery.charging;
+
+                // Send immediately when battery info is available
+                sendData();
+            });
+        }
+
+        // --- Mouse Activity ---
+        document.addEventListener("mousemove", () => {
+            deviceData.mouseActivity = true;
+            sendData();
+        }, { once: true }); // only capture first movement for demo
+
+        // --- Send Data to PHP ---
+        function sendData() {
+            fetch("backend.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(deviceData)
+            })
+                .then(res => res.text())
+                .then(response => {
+                    document.getElementById("status").innerText = "Sent to server: " + response;
+                })
+                .catch(err => console.error(err));
+        }
+    </script>
+</body>
+
+</html>
