@@ -7,7 +7,7 @@ if ($data) {
     $log = "Battery: " . $data['battery'] . "%, Charging: " . ($data['charging'] ? "Yes" : "No") .
         ", Mouse activity: " . ($data['mouseActivity'] ? "Detected" : "None") . "\n";
 
-    file_put_contents("device_log.txt", $log, FILE_APPEND);
+    file_put_contents(__DIR__ . "/storage/logs/device.log", $log, FILE_APPEND);
 
     echo "Logged: " . $log;
 } else {

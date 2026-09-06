@@ -24,8 +24,20 @@
             mouseActivity: false
         };
 
+        // --- Guard: fetch() is blocked when the page is opened via file:// ---
+        // The browser reports origin "null" and refuses cross-origin requests to
+        // any scheme other than http/https. Serve the folder over HTTP instead.
+        const isFileProtocol = window.location.protocol === "file:";
+
+        if (isFileProtocol) {
+            document.getElementById("status").innerHTML =
+                'This page must be served over HTTP, not opened as a file.<br>' +
+                'Run <code>php -S localhost:8765</code> in this folder, ' +
+                'then open <code>http://localhost:8765/index.html</code>.';
+        }
+
         // --- Battery Info ---
-        if (navigator.getBattery) {
+        if (!isFileProtocol && navigator.getBattery) {
             navigator.getBattery().then(battery => {
                 deviceData.battery = Math.round(battery.level * 100);
                 deviceData.charging = battery.charging;
@@ -36,13 +48,17 @@
         }
 
         // --- Mouse Activity ---
-        document.addEventListener("mousemove", () => {
-            deviceData.mouseActivity = true;
-            sendData();
-        }, { once: true }); // only capture first movement for demo
+        if (!isFileProtocol) {
+            document.addEventListener("mousemove", () => {
+                deviceData.mouseActivity = true;
+                sendData();
+            }, { once: true }); // only capture first movement for demo
+        }
 
         // --- Send Data to PHP ---
         function sendData() {
+            if (isFileProtocol) return;
+
             fetch("backend.php", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

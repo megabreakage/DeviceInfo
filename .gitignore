@@ -1,0 +1,12 @@
+.env
+.env.backup
+.env.local
+.env.testing
+vendor
+node_modules
+/storage/logs/*
+!/storage/logs/.gitkeep
+.vscode
+.github
+.claude
+
