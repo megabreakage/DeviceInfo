@@ -1,0 +1,1 @@
+Battery: 88%, Charging: Yes, Mouse activity: Detected
